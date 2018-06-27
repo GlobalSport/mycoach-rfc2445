@@ -1,9 +1,15 @@
 language: scala
 
+before_script:
+- openssl aes-256-cbc -K $encrypted_3b82e8952ea4_key -iv $encrypted_3b82e8952ea4_iv -in secrets.tar.gz.enc -out secrets.tar.gz -d
+- tar zxf secrets.tar.gz
+
 script:
 - |
   if [[ "$TRAVIS_BRANCH" == "master" ]]; then
-    sbt 'set isSnapshot := false' 'set version := IO.read(new File("VERSION")).mkString.trim' +publish
+    sbt 'set isSnapshot := false' 'set version := IO.read(new File("VERSION")).mkString.trim' test +publishSigned
+  elif [[ "$TRAVIS_BRANCH" == "develop" ]]; then
+    sbt -no-colors test +publishSigned -- -oF
   else
     sbt -no-colors test -- -oF
   fi
