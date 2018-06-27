@@ -23,8 +23,8 @@ publishTo := {
 }
 
 credentials ++= Seq(
-  Credentials("pgp.credentials"),
-  Credentials("nexus.credentials")
+  Credentials(file("pgp.credentials")),
+  Credentials(file("nexus.credentials"))
 )
 
 pomIncludeRepository := { _ => false }
