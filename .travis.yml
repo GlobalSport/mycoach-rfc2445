@@ -1,11 +1,17 @@
 language: scala
 
+before_script:
+- openssl aes-256-cbc -K $encrypted_3b82e8952ea4_key -iv $encrypted_3b82e8952ea4_iv -in pgp.credentials.enc -out pgp.credentials -d
+- openssl aes-256-cbc -K $encrypted_3b82e8952ea4_key -iv $encrypted_3b82e8952ea4_iv -in nexus.credentials.enc -out nexus.credentials -d
+- openssl aes-256-cbc -K $encrypted_3b82e8952ea4_key -iv $encrypted_3b82e8952ea4_iv -in private.key.enc -out private.key -d
+- openssl aes-256-cbc -K $encrypted_3b82e8952ea4_key -iv $encrypted_3b82e8952ea4_iv -in public.key.enc -out public.key -d
+
 script:
 - |
   if [[ "$TRAVIS_BRANCH" == "master" ]]; then
     sbt 'set isSnapshot := false' 'set version := IO.read(new File("VERSION")).mkString.trim' +publish
   else
-    sbt -no-colors test -- -oF
+    sbt -no-colors test +publishSigned -- -oF
   fi
 
 # Don't build version tags
