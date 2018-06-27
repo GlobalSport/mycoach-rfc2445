@@ -25,6 +25,7 @@ libraryDependencies += "com.mycoachsport" %% "mycoach-rfc2445" % "0.0.1"
 ## Samples
 ```scala
 // Generate an event per day from 10 to 12 UTC between the 20th of June and the 25th of June (included)
+val UTC = ZoneId.of("UTC")
 EventGenerator
     .generate(
       DateRange(
