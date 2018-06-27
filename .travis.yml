@@ -3,6 +3,7 @@ language: scala
 before_script:
 - openssl aes-256-cbc -K $encrypted_3b82e8952ea4_key -iv $encrypted_3b82e8952ea4_iv -in secrets.tar.gz.enc -out secrets.tar.gz -d
 - tar zxf secrets.tar.gz
+- ls
 
 script:
 - |
