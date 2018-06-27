@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Globalsport
+ * Copyright 2018 Globalsport SAS
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
  *
@@ -8,29 +8,33 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.globalsport
+package com.mycoachsport.model
 
 import java.time.ZonedDateTime
 
-import com.globalsport.model.DateTimeHelper._
-import com.globalsport.model.{Freq, Recur}
-import org.scalatest.Matchers._
-import org.scalatest.WordSpec
+import com.mycoachsport.model.DateTimeHelper._
 
-class RecurTest extends WordSpec {
+/**
+  * A Recurrence rule.
+  *
+  * The `count` and `until` parameters are mutually exclusives.
+  *
+  * @param freq  the frequence of this recurrence rule
+  * @param count the number of occurence of the reccurence
+  * @param until the date until this recurrence rule should apply
+  * @throws IllegalArgumentException when both `until` and `count` parameters are set to `Some`
+  */
+case class Recur(freq: Freq.Value, count: Option[Long], until: Option[ZonedDateTime]) {
+  require(!(count.isDefined && until.isDefined), "'count' and 'until' are mutually exclusive parameters")
 
-  "Recur" should {
-    "Produce a valid RECUR rule" in {
-      Recur(Freq.Weekly, None, None).toString shouldBe "FREQ=WEEKLY"
-      Recur(Freq.Daily, None, None).toString shouldBe "FREQ=DAILY"
-      Recur(Freq.Daily, Some(10), None).toString shouldBe "FREQ=DAILY;COUNT=10"
-      Recur(Freq.Daily, None, Some(ZonedDateTime.of(2018, 6, 26, 14, 0, 0, 0, UTC))).toString shouldBe "FREQ=DAILY;UNTIL=20180626T140000Z"
-    }
-
-    "Throw when used with both count and until" in {
-      the[IllegalArgumentException] thrownBy
-        (Recur(Freq.Weekly, Some(10), Some(ZonedDateTime.now(UTC)))) should have message
-        "requirement failed: 'count' and 'until' are mutually exclusive parameters"
-    }
+  /**
+    * Returns the corresponding RECUR string representation
+    */
+  override def toString: String = {
+    Seq(
+      Some(s"FREQ=${freq.toString}"),
+      count.map(c => s"COUNT=$c"),
+      until.map(u => s"UNTIL=${u.format(ICalUtcDateTimeFormat)}")
+    ).flatten.mkString(";")
   }
 }

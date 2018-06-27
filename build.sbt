@@ -1,6 +1,6 @@
 name := "mycoach-rfc2445"
 
-organization := "com.globalsport"
+organization := "com.mycoachsport"
 
 version := IO.read(new File("VERSION")).mkString.trim + "-SNAPSHOT"
 
