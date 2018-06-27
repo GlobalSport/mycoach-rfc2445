@@ -22,10 +22,9 @@ publishTo := {
     Some("releases" at nexus + "service/local/staging/deploy/maven2")
 }
 
-credentials ++= Seq(
-  Credentials(file("pgp.credentials")),
-  Credentials(file("nexus.credentials"))
-)
+credentials += Credentials(file(s"${baseDirectory.value.getAbsolutePath}/nexus.credentials"))
+
+credentials in GlobalScope += Credentials(file(s"${baseDirectory.value.getAbsolutePath}/pgp.credentials"))
 
 pomIncludeRepository := { _ => false }
 
