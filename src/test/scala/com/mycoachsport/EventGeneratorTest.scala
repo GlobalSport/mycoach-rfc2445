@@ -83,6 +83,49 @@ class EventGeneratorTest extends WordSpec {
       }.toSet
     }
 
+    "Generate all daily events" in {
+      EventGenerator
+        .generate(
+          RecurringEvent(
+            ZonedDateTime.of(2018, 6, 20, 10, 0, 0, 0, UTC),
+            ZonedDateTime.of(2018, 6, 20, 12, 0, 0, 0, UTC),
+            Recur(Freq.Daily, Some(10), None),
+            Set())
+        ) shouldBe (0 to 10).map {
+        n =>
+          Event(
+            ZonedDateTime.of(2018, 6, 20, 10, 0, 0, 0, UTC).plusDays(n),
+            ZonedDateTime.of(2018, 6, 20, 12, 0, 0, 0, UTC).plusDays(n)
+          )
+      }.toSet
+
+      EventGenerator
+        .generate(
+          RecurringEvent(
+            ZonedDateTime.of(2018, 6, 20, 10, 0, 0, 0, UTC),
+            ZonedDateTime.of(2018, 6, 20, 12, 0, 0, 0, UTC),
+            Recur(Freq.Daily, None, Some(ZonedDateTime.of(2018, 6, 30, 0, 0, 0, 0, UTC))),
+            Set()
+          )
+        ) shouldBe (0 until 11).map {
+        n =>
+          Event(
+            ZonedDateTime.of(2018, 6, 20, 10, 0, 0, 0, UTC).plusDays(n),
+            ZonedDateTime.of(2018, 6, 20, 12, 0, 0, 0, UTC).plusDays(n)
+          )
+      }.toSet
+    }
+
+    "Throw if infitine recursion when generating all events" in {
+      intercept[IllegalArgumentException] {
+        EventGenerator.generate(RecurringEvent(
+          ZonedDateTime.of(2018, 6, 20, 10, 0, 0, 0, UTC),
+          ZonedDateTime.of(2018, 6, 20, 12, 0, 0, 0, UTC),
+          Recur(Freq.Daily, None, None),
+          Set()))
+      }
+    }
+
     "Generate all daily events within a time range bound by COUNT" in {
       EventGenerator
         .generate(

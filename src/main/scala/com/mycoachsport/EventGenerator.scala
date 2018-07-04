@@ -31,7 +31,21 @@ object EventGenerator {
     * @param recurringEvent the generator's recurring event
     * @return returns the events for this `dateRange`
     */
-  def generate(dateRange: DateRange, recurringEvent: RecurringEvent): Set[Event] = {
+  def generate(dateRange: DateRange, recurringEvent: RecurringEvent): Set[Event] =
+    generate(Some(dateRange), recurringEvent)
+
+  /**
+    * Generates all the events for this `RecurringEvent` definition
+    *
+    * @param recurringEvent the generator's recurring event
+    * @return returns all the recuring events generated
+    */
+  def generate(recurringEvent: RecurringEvent): Set[Event] = {
+    require(recurringEvent.rrule.until.isDefined || recurringEvent.rrule.count.isDefined, "Generating an infinite number of events is not supported")
+    generate(None, recurringEvent)
+  }
+
+  private def generate(dateRange: Option[DateRange], recurringEvent: RecurringEvent): Set[Event] = {
     val startDate = getGeneratorStartDate(dateRange, recurringEvent)
     val endDate = getGeneratorEndDate(dateRange, recurringEvent)
 
@@ -63,16 +77,21 @@ object EventGenerator {
     }.toSet
   }
 
-  private def getGeneratorStartDate(dateRange: DateRange, recurringEvent: RecurringEvent): LocalDate = {
-    dateRange.startDate isAfter recurringEvent.firstOccurenceStartDate match {
-      case true =>
-        dateRange.startDate
-      case false =>
+  private def getGeneratorStartDate(dateRange: Option[DateRange], recurringEvent: RecurringEvent): LocalDate = {
+    dateRange match {
+      case Some(dr) =>
+        dr.startDate isAfter recurringEvent.firstOccurenceStartDate match {
+          case true =>
+            dr.startDate
+          case false =>
+            recurringEvent.firstOccurenceStartDate
+        }
+      case None =>
         recurringEvent.firstOccurenceStartDate
     }
   }
 
-  private def getGeneratorEndDate(dateRange: DateRange, recurringEvent: RecurringEvent): LocalDate = {
+  private def getGeneratorEndDate(dateRange: Option[DateRange], recurringEvent: RecurringEvent): LocalDate = {
     val recurringEventFinalDate = (recurringEvent.rrule.freq, recurringEvent.rrule.count, recurringEvent.rrule.until) match {
       case (Freq.Daily, Some(count), None) =>
         recurringEvent.firstOccurenceEndDate.plusDays(count)
@@ -84,12 +103,19 @@ object EventGenerator {
         throw new IllegalArgumentException("Will not happen until Recur has the require")
     }
 
-    dateRange.endDate isAfter recurringEventFinalDate match {
-      case true =>
+
+    dateRange match {
+      case Some(dr) =>
+        dr.endDate isAfter recurringEventFinalDate match {
+          case true =>
+            recurringEventFinalDate
+          case false =>
+            dr.endDate
+        }
+      case None =>
         recurringEventFinalDate
-      case false =>
-        dateRange.endDate
     }
+
   }
 
   private implicit def FreqToTemporalUnit(freq: Freq.Value): ChronoUnit = freq match {
