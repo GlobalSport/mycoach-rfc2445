@@ -94,9 +94,9 @@ object EventGenerator {
   private def getGeneratorEndDate(dateRange: Option[DateRange], recurringEvent: RecurringEvent): LocalDate = {
     val recurringEventFinalDate = (recurringEvent.rrule.freq, recurringEvent.rrule.count, recurringEvent.rrule.until) match {
       case (Freq.Daily, Some(count), None) =>
-        recurringEvent.firstOccurenceEndDate.plusDays(count)
+        recurringEvent.firstOccurenceEndDate.plusDays(count - 1)
       case (Freq.Weekly, Some(count), None) =>
-        recurringEvent.firstOccurenceEndDate.plusWeeks(count)
+        recurringEvent.firstOccurenceEndDate.plusWeeks(count - 1)
       case (_, None, Some(finishDate)) =>
         finishDate
       case _ =>
