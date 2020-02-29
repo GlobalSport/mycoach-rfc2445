@@ -4,9 +4,9 @@ organization := "com.mycoachsport"
 
 version := IO.read(new File("VERSION")).mkString.trim + "-SNAPSHOT"
 
-scalaVersion := "2.12.6"
+scalaVersion := "2.13.1"
 
-crossScalaVersions := Seq("2.11.12", "2.12.6")
+crossScalaVersions := Seq("2.11.12", "2.12.10", "2.13.1")
 
 isSnapshot := true
 
@@ -22,14 +22,19 @@ publishTo := {
     Some("releases" at nexus + "service/local/staging/deploy/maven2")
 }
 
-credentials += Credentials(file(s"${baseDirectory.value.getAbsolutePath}/nexus.credentials"))
+credentials += Credentials(
+  file(s"${baseDirectory.value.getAbsolutePath}/nexus.credentials")
+)
 
-credentials in GlobalScope += Credentials(file(s"${baseDirectory.value.getAbsolutePath}/pgp.credentials"))
+credentials in GlobalScope += Credentials(
+  file(s"${baseDirectory.value.getAbsolutePath}/pgp.credentials")
+)
 
-pomIncludeRepository := { _ => false }
+pomIncludeRepository := { _ =>
+  false
+}
 
-pomExtra := (
-  <url>https://github.com/GlobalSport/mycoach-rfc2445</url>
+pomExtra := (<url>https://github.com/GlobalSport/mycoach-rfc2445</url>
     <licenses>
       <license>
         <name>MIT</name>
@@ -52,6 +57,4 @@ pomExtra := (
 pgpPublicRing := file("public.key")
 pgpSecretRing := file("private.key")
 
-libraryDependencies ++= Seq(
-  "org.scalatest" %% "scalatest" % "3.0.4" % Test
-)
+libraryDependencies ++= Seq("org.scalatest" %% "scalatest" % "3.1.1" % Test)
