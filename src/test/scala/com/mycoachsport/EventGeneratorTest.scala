@@ -27,18 +27,22 @@ class EventGeneratorTest extends WordSpec {
           DateRange(
             ZonedDateTime.of(2018, 6, 18, 0, 0, 0, 0, UTC),
             ZonedDateTime.of(2018, 7, 30, 0, 0, 0, 0, UTC)
-          ), RecurringEvent(
+          ),
+          RecurringEvent(
             ZonedDateTime.of(2018, 6, 20, 10, 0, 0, 0, UTC),
             ZonedDateTime.of(2018, 6, 20, 12, 0, 0, 0, UTC),
-            Recur(Freq.Daily, None, Some(ZonedDateTime.of(2018, 6, 25, 0, 0, 0, 0, UTC))),
+            Recur(
+              Freq.Daily,
+              None,
+              Some(ZonedDateTime.of(2018, 6, 25, 0, 0, 0, 0, UTC))
+            ),
             Set()
           )
-        ) shouldBe (0 to 5).map {
-        n =>
-          Event(
-            ZonedDateTime.of(2018, 6, 20, 10, 0, 0, 0, UTC).plusDays(n),
-            ZonedDateTime.of(2018, 6, 20, 12, 0, 0, 0, UTC).plusDays(n)
-          )
+        ) shouldBe (0 to 5).map { n =>
+        Event(
+          ZonedDateTime.of(2018, 6, 20, 10, 0, 0, 0, UTC).plusDays(n),
+          ZonedDateTime.of(2018, 6, 20, 12, 0, 0, 0, UTC).plusDays(n)
+        )
       }.toSet
     }
 
@@ -53,13 +57,13 @@ class EventGeneratorTest extends WordSpec {
             ZonedDateTime.of(2018, 6, 20, 10, 0, 0, 0, UTC),
             ZonedDateTime.of(2018, 6, 20, 12, 0, 0, 0, UTC),
             Recur(Freq.Daily, Some(10), None),
-            Set())
-        ) shouldBe (0 to 7).map {
-        n =>
-          Event(
-            ZonedDateTime.of(2018, 6, 20, 10, 0, 0, 0, UTC).plusDays(n),
-            ZonedDateTime.of(2018, 6, 20, 12, 0, 0, 0, UTC).plusDays(n)
+            Set()
           )
+        ) shouldBe (0 to 7).map { n =>
+        Event(
+          ZonedDateTime.of(2018, 6, 20, 10, 0, 0, 0, UTC).plusDays(n),
+          ZonedDateTime.of(2018, 6, 20, 12, 0, 0, 0, UTC).plusDays(n)
+        )
       }.toSet
 
       EventGenerator
@@ -71,15 +75,18 @@ class EventGeneratorTest extends WordSpec {
           RecurringEvent(
             ZonedDateTime.of(2018, 6, 20, 10, 0, 0, 0, UTC),
             ZonedDateTime.of(2018, 6, 20, 12, 0, 0, 0, UTC),
-            Recur(Freq.Daily, None, Some(ZonedDateTime.of(2018, 12, 1, 0, 0, 0, 0, UTC))),
+            Recur(
+              Freq.Daily,
+              None,
+              Some(ZonedDateTime.of(2018, 12, 1, 0, 0, 0, 0, UTC))
+            ),
             Set()
           )
-        ) shouldBe (0 to 7).map {
-        n =>
-          Event(
-            ZonedDateTime.of(2018, 6, 20, 10, 0, 0, 0, UTC).plusDays(n),
-            ZonedDateTime.of(2018, 6, 20, 12, 0, 0, 0, UTC).plusDays(n)
-          )
+        ) shouldBe (0 to 7).map { n =>
+        Event(
+          ZonedDateTime.of(2018, 6, 20, 10, 0, 0, 0, UTC).plusDays(n),
+          ZonedDateTime.of(2018, 6, 20, 12, 0, 0, 0, UTC).plusDays(n)
+        )
       }.toSet
     }
 
@@ -90,13 +97,13 @@ class EventGeneratorTest extends WordSpec {
             ZonedDateTime.of(2018, 6, 20, 10, 0, 0, 0, UTC),
             ZonedDateTime.of(2018, 6, 20, 12, 0, 0, 0, UTC),
             Recur(Freq.Daily, Some(10), None),
-            Set())
-        ) shouldBe (0 until 10).map {
-        n =>
-          Event(
-            ZonedDateTime.of(2018, 6, 20, 10, 0, 0, 0, UTC).plusDays(n),
-            ZonedDateTime.of(2018, 6, 20, 12, 0, 0, 0, UTC).plusDays(n)
+            Set()
           )
+        ) shouldBe (0 until 10).map { n =>
+        Event(
+          ZonedDateTime.of(2018, 6, 20, 10, 0, 0, 0, UTC).plusDays(n),
+          ZonedDateTime.of(2018, 6, 20, 12, 0, 0, 0, UTC).plusDays(n)
+        )
       }.toSet
 
       EventGenerator
@@ -104,25 +111,31 @@ class EventGeneratorTest extends WordSpec {
           RecurringEvent(
             ZonedDateTime.of(2018, 6, 20, 10, 0, 0, 0, UTC),
             ZonedDateTime.of(2018, 6, 20, 12, 0, 0, 0, UTC),
-            Recur(Freq.Daily, None, Some(ZonedDateTime.of(2018, 6, 30, 0, 0, 0, 0, UTC))),
+            Recur(
+              Freq.Daily,
+              None,
+              Some(ZonedDateTime.of(2018, 6, 30, 0, 0, 0, 0, UTC))
+            ),
             Set()
           )
-        ) shouldBe (0 until 11).map {
-        n =>
-          Event(
-            ZonedDateTime.of(2018, 6, 20, 10, 0, 0, 0, UTC).plusDays(n),
-            ZonedDateTime.of(2018, 6, 20, 12, 0, 0, 0, UTC).plusDays(n)
-          )
+        ) shouldBe (0 until 11).map { n =>
+        Event(
+          ZonedDateTime.of(2018, 6, 20, 10, 0, 0, 0, UTC).plusDays(n),
+          ZonedDateTime.of(2018, 6, 20, 12, 0, 0, 0, UTC).plusDays(n)
+        )
       }.toSet
     }
 
     "Throw if infitine recursion when generating all events" in {
       intercept[IllegalArgumentException] {
-        EventGenerator.generate(RecurringEvent(
-          ZonedDateTime.of(2018, 6, 20, 10, 0, 0, 0, UTC),
-          ZonedDateTime.of(2018, 6, 20, 12, 0, 0, 0, UTC),
-          Recur(Freq.Daily, None, None),
-          Set()))
+        EventGenerator.generate(
+          RecurringEvent(
+            ZonedDateTime.of(2018, 6, 20, 10, 0, 0, 0, UTC),
+            ZonedDateTime.of(2018, 6, 20, 12, 0, 0, 0, UTC),
+            Recur(Freq.Daily, None, None),
+            Set()
+          )
+        )
       }
     }
 
@@ -137,13 +150,13 @@ class EventGeneratorTest extends WordSpec {
             ZonedDateTime.of(2018, 6, 18, 10, 0, 0, 0, UTC),
             ZonedDateTime.of(2018, 6, 18, 12, 0, 0, 0, UTC),
             Recur(Freq.Daily, Some(10), None),
-            Set())
-        ) shouldBe (0 until 8).map {
-        n =>
-          Event(
-            ZonedDateTime.of(2018, 6, 20, 10, 0, 0, 0, UTC).plusDays(n),
-            ZonedDateTime.of(2018, 6, 20, 12, 0, 0, 0, UTC).plusDays(n)
+            Set()
           )
+        ) shouldBe (0 until 8).map { n =>
+        Event(
+          ZonedDateTime.of(2018, 6, 20, 10, 0, 0, 0, UTC).plusDays(n),
+          ZonedDateTime.of(2018, 6, 20, 12, 0, 0, 0, UTC).plusDays(n)
+        )
       }.toSet
     }
 
@@ -158,13 +171,13 @@ class EventGeneratorTest extends WordSpec {
             ZonedDateTime.of(2018, 6, 20, 10, 0, 0, 0, UTC),
             ZonedDateTime.of(2018, 6, 20, 12, 0, 0, 0, UTC),
             Recur(Freq.Weekly, Some(4), None),
-            Set())
-        ) shouldBe (0 until 4).map {
-        n =>
-          Event(
-            ZonedDateTime.of(2018, 6, 20, 10, 0, 0, 0, UTC).plusWeeks(n),
-            ZonedDateTime.of(2018, 6, 20, 12, 0, 0, 0, UTC).plusWeeks(n)
+            Set()
           )
+        ) shouldBe (0 until 4).map { n =>
+        Event(
+          ZonedDateTime.of(2018, 6, 20, 10, 0, 0, 0, UTC).plusWeeks(n),
+          ZonedDateTime.of(2018, 6, 20, 12, 0, 0, 0, UTC).plusWeeks(n)
+        )
       }.toSet
     }
 
@@ -179,31 +192,36 @@ class EventGeneratorTest extends WordSpec {
             ZonedDateTime.of(2018, 6, 20, 10, 0, 0, 0, UTC),
             ZonedDateTime.of(2018, 6, 20, 12, 0, 0, 0, UTC),
             Recur(Freq.Weekly, Some(10), None),
-            Set())
-        ) shouldBe (0 until 4).map {
-        n =>
-          Event(
-            ZonedDateTime.of(2018, 6, 20, 10, 0, 0, 0, UTC).plusWeeks(n),
-            ZonedDateTime.of(2018, 6, 20, 12, 0, 0, 0, UTC).plusWeeks(n)
+            Set()
           )
+        ) shouldBe (0 until 4).map { n =>
+        Event(
+          ZonedDateTime.of(2018, 6, 20, 10, 0, 0, 0, UTC).plusWeeks(n),
+          ZonedDateTime.of(2018, 6, 20, 12, 0, 0, 0, UTC).plusWeeks(n)
+        )
       }.toSet
 
       EventGenerator
         .generate(
           DateRange(
             ZonedDateTime.of(2018, 6, 20, 0, 0, 0, 0, UTC),
-            ZonedDateTime.of(2018, 7, 11, 0, 0, 0, 0, UTC)),
+            ZonedDateTime.of(2018, 7, 11, 0, 0, 0, 0, UTC)
+          ),
           RecurringEvent(
             ZonedDateTime.of(2018, 6, 20, 10, 0, 0, 0, UTC),
             ZonedDateTime.of(2018, 6, 20, 12, 0, 0, 0, UTC),
-            Recur(Freq.Weekly, None, Some(ZonedDateTime.of(2018, 12, 1, 0, 0, 0, 0, UTC))),
-            Set())
-        ) shouldBe (0 until 4).map {
-        n =>
-          Event(
-            ZonedDateTime.of(2018, 6, 20, 10, 0, 0, 0, UTC).plusWeeks(n),
-            ZonedDateTime.of(2018, 6, 20, 12, 0, 0, 0, UTC).plusWeeks(n)
+            Recur(
+              Freq.Weekly,
+              None,
+              Some(ZonedDateTime.of(2018, 12, 1, 0, 0, 0, 0, UTC))
+            ),
+            Set()
           )
+        ) shouldBe (0 until 4).map { n =>
+        Event(
+          ZonedDateTime.of(2018, 6, 20, 10, 0, 0, 0, UTC).plusWeeks(n),
+          ZonedDateTime.of(2018, 6, 20, 12, 0, 0, 0, UTC).plusWeeks(n)
+        )
       }.toSet
     }
 
@@ -212,18 +230,23 @@ class EventGeneratorTest extends WordSpec {
         .generate(
           DateRange(
             ZonedDateTime.of(2018, 6, 20, 0, 0, 0, 0, UTC),
-            ZonedDateTime.of(2018, 7, 25, 0, 0, 0, 0, UTC)),
+            ZonedDateTime.of(2018, 7, 25, 0, 0, 0, 0, UTC)
+          ),
           RecurringEvent(
             ZonedDateTime.of(2018, 6, 20, 10, 0, 0, 0, UTC),
             ZonedDateTime.of(2018, 6, 20, 12, 0, 0, 0, UTC),
-            Recur(Freq.Weekly, None, Some(ZonedDateTime.of(2018, 7, 4, 0, 0, 0, 0, UTC))),
-            Set())
-        ) shouldBe (0 until 3).map {
-        n =>
-          Event(
-            ZonedDateTime.of(2018, 6, 20, 10, 0, 0, 0, UTC).plusWeeks(n),
-            ZonedDateTime.of(2018, 6, 20, 12, 0, 0, 0, UTC).plusWeeks(n)
+            Recur(
+              Freq.Weekly,
+              None,
+              Some(ZonedDateTime.of(2018, 7, 4, 0, 0, 0, 0, UTC))
+            ),
+            Set()
           )
+        ) shouldBe (0 until 3).map { n =>
+        Event(
+          ZonedDateTime.of(2018, 6, 20, 10, 0, 0, 0, UTC).plusWeeks(n),
+          ZonedDateTime.of(2018, 6, 20, 12, 0, 0, 0, UTC).plusWeeks(n)
+        )
       }.toSet
     }
 
@@ -232,11 +255,16 @@ class EventGeneratorTest extends WordSpec {
         .generate(
           DateRange(
             ZonedDateTime.of(2018, 6, 20, 0, 0, 0, 0, UTC),
-            ZonedDateTime.of(2018, 7, 25, 0, 0, 0, 0, UTC)),
+            ZonedDateTime.of(2018, 7, 25, 0, 0, 0, 0, UTC)
+          ),
           RecurringEvent(
             ZonedDateTime.of(2018, 6, 20, 10, 0, 0, 0, UTC),
             ZonedDateTime.of(2018, 6, 20, 12, 0, 0, 0, UTC),
-            Recur(Freq.Weekly, None, Some(ZonedDateTime.of(2018, 7, 18, 0, 0, 0, 0, UTC))),
+            Recur(
+              Freq.Weekly,
+              None,
+              Some(ZonedDateTime.of(2018, 7, 18, 0, 0, 0, 0, UTC))
+            ),
             Set(
               ZonedDateTime.of(2018, 6, 20, 10, 0, 0, 0, UTC),
               ZonedDateTime.of(2018, 7, 4, 10, 0, 0, 0, UTC)
@@ -258,7 +286,7 @@ class EventGeneratorTest extends WordSpec {
       )
     }
 
-    "Generate only one event when the count is 1" in {
+    "Generate only one daily event when the count is 1" in {
       EventGenerator
         .generate(
           RecurringEvent(
@@ -276,6 +304,131 @@ class EventGeneratorTest extends WordSpec {
         )
     }
 
+    "Generate only one weekly event when the count is 1" in {
+      EventGenerator
+        .generate(
+          RecurringEvent(
+            ZonedDateTime.of(2018, 6, 20, 10, 0, 0, 0, UTC),
+            ZonedDateTime.of(2018, 6, 20, 12, 0, 0, 0, UTC),
+            Recur(Freq.Weekly, Some(1), None),
+            Set()
+          )
+        ) shouldBe
+        Set(
+          Event(
+            ZonedDateTime.of(2018, 6, 20, 10, 0, 0, 0, UTC),
+            ZonedDateTime.of(2018, 6, 20, 12, 0, 0, 0, UTC)
+          )
+        )
+    }
+
+    "Generate only one yearly event when the count is 1" in {
+      EventGenerator
+        .generate(
+          RecurringEvent(
+            ZonedDateTime.of(2018, 6, 20, 10, 0, 0, 0, UTC),
+            ZonedDateTime.of(2018, 6, 20, 12, 0, 0, 0, UTC),
+            Recur(Freq.Yearly, Some(1), None),
+            Set()
+          )
+        ) shouldBe
+        Set(
+          Event(
+            ZonedDateTime.of(2018, 6, 20, 10, 0, 0, 0, UTC),
+            ZonedDateTime.of(2018, 6, 20, 12, 0, 0, 0, UTC)
+          )
+        )
+    }
+
+    "Generate all yearly events within a time range bound by COUNT" in {
+      EventGenerator
+        .generate(
+          DateRange(
+            ZonedDateTime.of(2018, 6, 15, 0, 0, 0, 0, UTC),
+            ZonedDateTime.of(2020, 9, 30, 0, 0, 0, 0, UTC)
+          ),
+          RecurringEvent(
+            ZonedDateTime.of(2018, 6, 18, 0, 0, 0, 0, UTC),
+            ZonedDateTime.of(2018, 6, 18, 23, 59, 59, 0, UTC),
+            Recur(Freq.Yearly, Some(5), None),
+            Set()
+          )
+        ) shouldBe (0 until 3).map { n =>
+        Event(
+          ZonedDateTime.of(2018, 6, 18, 0, 0, 0, 0, UTC).plusYears(n),
+          ZonedDateTime.of(2018, 6, 18, 23, 59, 59, 0, UTC).plusYears(n),
+        )
+      }.toSet
+    }
+
+    "Generate all yearly events within a time range bound by UNTIL" in {
+      EventGenerator
+        .generate(
+          DateRange(
+            ZonedDateTime.of(2018, 6, 15, 0, 0, 0, 0, UTC),
+            ZonedDateTime.of(2020, 9, 30, 0, 0, 0, 0, UTC)
+          ),
+          RecurringEvent(
+            ZonedDateTime.of(2018, 6, 18, 0, 0, 0, 0, UTC),
+            ZonedDateTime.of(2018, 6, 18, 23, 59, 59, 0, UTC),
+            Recur(
+              Freq.Yearly,
+              None,
+              Some(ZonedDateTime.of(2020, 9, 30, 0, 0, 0, 0, UTC))
+            ),
+            Set()
+          )
+        ) shouldBe (0 until 3).map { n =>
+        Event(
+          ZonedDateTime.of(2018, 6, 18, 0, 0, 0, 0, UTC).plusYears(n),
+          ZonedDateTime.of(2018, 6, 18, 23, 59, 59, 0, UTC).plusYears(n),
+        )
+      }.toSet
+    }
+
+    "Generate all yearly events within a time range bound by UNTIL without range" in {
+      EventGenerator
+        .generate(
+          RecurringEvent(
+            ZonedDateTime.of(2018, 6, 18, 0, 0, 0, 0, UTC),
+            ZonedDateTime.of(2018, 6, 18, 23, 59, 59, 0, UTC),
+            Recur(
+              Freq.Yearly,
+              None,
+              Some(ZonedDateTime.of(2020, 9, 30, 0, 0, 0, 0, UTC))
+            ),
+            Set()
+          )
+        ) shouldBe (0 until 3).map { n =>
+        Event(
+          ZonedDateTime.of(2018, 6, 18, 0, 0, 0, 0, UTC).plusYears(n),
+          ZonedDateTime.of(2018, 6, 18, 23, 59, 59, 0, UTC).plusYears(n),
+        )
+      }.toSet
+    }
+
+    "Generate all yearly events within a time range and exclude a set of dates" in {
+      EventGenerator
+        .generate(
+          RecurringEvent(
+            ZonedDateTime.of(2018, 6, 18, 0, 0, 0, 0, UTC),
+            ZonedDateTime.of(2018, 6, 18, 23, 59, 59, 0, UTC),
+            Recur(
+              Freq.Yearly,
+              None,
+              Some(ZonedDateTime.of(2020, 9, 30, 0, 0, 0, 0, UTC))
+            ),
+            Set(
+              ZonedDateTime.of(2020, 6, 18, 0, 0, 0, 0, UTC)
+            )
+          )
+        ) shouldBe (0 until 2).map { n =>
+        Event(
+          ZonedDateTime.of(2018, 6, 18, 0, 0, 0, 0, UTC).plusYears(n),
+          ZonedDateTime.of(2018, 6, 18, 23, 59, 59, 0, UTC).plusYears(n),
+        )
+      }.toSet
+    }
   }
 
 }

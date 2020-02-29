@@ -25,6 +25,7 @@ class RecurParserTest extends WordSpec {
     "Parse freq" in {
       RecurParser.parse("RRULE:FREQ=WEEKLY;").freq shouldBe Freq.Weekly
       RecurParser.parse("RRULE:FREQ=DAILY;").freq shouldBe Freq.Daily
+      RecurParser.parse("RRULE:FREQ=YEARLY;").freq shouldBe Freq.Yearly
     }
 
     "Throw when freq is missing" in {
@@ -47,7 +48,9 @@ class RecurParserTest extends WordSpec {
 
       RecurParser.parse("RRULE:FREQ=DAILY;UNTIL=FOO").until shouldBe None
 
-      RecurParser.parse("RRULE:FREQ=DAILY;UNTIL=19901025T0430").until shouldBe None
+      RecurParser
+        .parse("RRULE:FREQ=DAILY;UNTIL=19901025T0430")
+        .until shouldBe None
     }
   }
 }

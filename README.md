@@ -12,7 +12,7 @@ We failed to find something small, maintained and not outdated.
 
 ## Features
 - Parsing [Recurrence rule](https://tools.ietf.org/html/rfc5545#section-3.3.10) and extracting
-    - FREQ (only *DAILY* and *WEEKLY* at this time)
+    - FREQ (only *DAILY*, *WEEKLY* and *YEARLY* at this time)
     - COUNT
     - UNTIL
 - Generating events based on RRULE and EXDATE

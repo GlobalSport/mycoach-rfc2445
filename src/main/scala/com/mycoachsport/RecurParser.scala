@@ -32,7 +32,7 @@ import com.mycoachsport.model.{Freq, Recur}
   */
 object RecurParser {
 
-  private val FreqPattern = ".*FREQ=(DAILY|WEEKLY).*".r
+  private val FreqPattern = ".*FREQ=(DAILY|WEEKLY|YEARLY).*".r
   private val CountPattern = ".*COUNT=(\\d+).*".r
   private val UntilPattern = ".*UNTIL=([0-9]{8}T[0-9]{6}Z).*".r
 

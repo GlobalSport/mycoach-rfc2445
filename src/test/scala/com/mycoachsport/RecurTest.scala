@@ -23,7 +23,9 @@ class RecurTest extends WordSpec {
     "Produce a valid RECUR rule" in {
       Recur(Freq.Weekly, None, None).toString shouldBe "FREQ=WEEKLY"
       Recur(Freq.Daily, None, None).toString shouldBe "FREQ=DAILY"
+      Recur(Freq.Yearly, None, None).toString shouldBe "FREQ=YEARLY"
       Recur(Freq.Daily, Some(10), None).toString shouldBe "FREQ=DAILY;COUNT=10"
+      Recur(Freq.Yearly, Some(10), None).toString shouldBe "FREQ=YEARLY;COUNT=10"
       Recur(Freq.Daily, None, Some(ZonedDateTime.of(2018, 6, 26, 14, 0, 0, 0, UTC))).toString shouldBe "FREQ=DAILY;UNTIL=20180626T140000Z"
     }
 

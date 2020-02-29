@@ -23,4 +23,5 @@ package com.mycoachsport.model
 object Freq extends Enumeration {
   val Daily: Freq.Value = Value("DAILY")
   val Weekly: Freq.Value = Value("WEEKLY")
+  val Yearly: Freq.Value = Value("YEARLY")
 }
