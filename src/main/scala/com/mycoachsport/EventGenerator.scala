@@ -25,17 +25,6 @@ import com.mycoachsport.model.{DateRange, Event, Freq, RecurringEvent}
 object EventGenerator {
 
   /**
-    * Generates all the events during the given `dateRange` based on the `recurringEvent`
-    *
-    * @param dateRange      the generator's date range
-    * @param recurringEvent the generator's recurring event
-    * @return returns the events for this `dateRange`
-    */
-  def generate(dateRange: DateRange,
-               recurringEvent: RecurringEvent): Set[Event] =
-    generate(Some(dateRange), recurringEvent)
-
-  /**
     * Generates all the events for this `RecurringEvent` definition
     *
     * @param recurringEvent the generator's recurring event
@@ -46,13 +35,8 @@ object EventGenerator {
       recurringEvent.rrule.until.isDefined || recurringEvent.rrule.count.isDefined,
       "Generating an infinite number of events is not supported"
     )
-    generate(None, recurringEvent)
-  }
-
-  private def generate(dateRange: Option[DateRange],
-                       recurringEvent: RecurringEvent): Set[Event] = {
-    val startDate = getGeneratorStartDate(dateRange, recurringEvent)
-    val endDate = getGeneratorEndDate(dateRange, recurringEvent)
+    val startDate = recurringEvent.firstOccurenceStartDate
+    val endDate = getGeneratorEndDate(recurringEvent)
 
     val eventDuration: Long = recurringEvent.firstOccurenceStartDate
       .until(recurringEvent.firstOccurenceEndDate, ChronoUnit.NANOS)
@@ -80,7 +64,7 @@ object EventGenerator {
       )
 
       recurringEvent.exdates
-        .contains(event.startDate) match {
+        .exists(_.isEqual(event.startDate)) match {
         case true =>
           None
         case false =>
@@ -89,25 +73,7 @@ object EventGenerator {
     }.toSet
   }
 
-  private def getGeneratorStartDate(
-    dateRange: Option[DateRange],
-    recurringEvent: RecurringEvent
-  ): LocalDate = {
-    dateRange match {
-      case Some(dr) =>
-        dr.startDate isAfter recurringEvent.firstOccurenceStartDate match {
-          case true =>
-            dr.startDate
-          case false =>
-            recurringEvent.firstOccurenceStartDate
-        }
-      case None =>
-        recurringEvent.firstOccurenceStartDate
-    }
-  }
-
-  private def getGeneratorEndDate(dateRange: Option[DateRange],
-                                  recurringEvent: RecurringEvent): LocalDate = {
+  private def getGeneratorEndDate(recurringEvent: RecurringEvent) = {
     val recurringEventFinalDate = (
       recurringEvent.rrule.freq,
       recurringEvent.rrule.count,
@@ -127,18 +93,7 @@ object EventGenerator {
         )
     }
 
-    dateRange match {
-      case Some(dr) =>
-        dr.endDate isAfter recurringEventFinalDate match {
-          case true =>
-            recurringEventFinalDate
-          case false =>
-            dr.endDate
-        }
-      case None =>
-        recurringEventFinalDate
-    }
-
+    recurringEventFinalDate
   }
 
   private implicit def FreqToTemporalUnit(freq: Freq.Value): ChronoUnit =
