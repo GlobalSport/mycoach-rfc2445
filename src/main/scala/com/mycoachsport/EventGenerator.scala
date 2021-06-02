@@ -10,11 +10,11 @@
 
 package com.mycoachsport
 
-import java.time.temporal.ChronoUnit
-import java.time.{LocalDate, LocalDateTime, ZonedDateTime}
-
 import com.mycoachsport.model.DateTimeHelper._
-import com.mycoachsport.model.{DateRange, Event, Freq, RecurringEvent}
+import com.mycoachsport.model.{Event, Freq, RecurringEvent}
+
+import java.time.temporal.{ChronoUnit, TemporalAdjusters}
+import java.time.{LocalDateTime, ZonedDateTime}
 
 /**
   * Event generator methods.
@@ -36,65 +36,87 @@ object EventGenerator {
       "Generating an infinite number of events is not supported"
     )
     val startDate = recurringEvent.firstOccurenceStartDate
-    val endDate = getGeneratorEndDate(recurringEvent)
 
     val eventDuration: Long = recurringEvent.firstOccurenceStartDate
       .until(recurringEvent.firstOccurenceEndDate, ChronoUnit.NANOS)
 
-    val range = startDate.until(endDate, recurringEvent.rrule.freq)
+    val events = LazyList
+      .from(0)
+      .flatMap { i =>
+        val eventStart = startDate.plus(i, recurringEvent.rrule.freq)
+        val event =
+          Event(
+            ZonedDateTime.of(
+              LocalDateTime.of(
+                eventStart,
+                recurringEvent.firstOccurenceStartDate.toLocalTime
+              ),
+              recurringEvent.firstOccurenceStartDate.getZone
+            ),
+            ZonedDateTime.of(
+              LocalDateTime.of(
+                eventStart,
+                recurringEvent.firstOccurenceStartDate
+                  .plus(eventDuration, ChronoUnit.NANOS)
+                  .toLocalTime
+              ),
+              recurringEvent.firstOccurenceEndDate.getZone
+            )
+          )
 
-    (0L to range).flatMap { i =>
-      val event = Event(
-        ZonedDateTime.of(
-          LocalDateTime.of(
-            startDate.plus(i, recurringEvent.rrule.freq),
-            recurringEvent.firstOccurenceStartDate.toLocalTime
-          ),
-          recurringEvent.firstOccurenceStartDate.getZone
-        ),
-        ZonedDateTime.of(
-          LocalDateTime.of(
-            startDate.plus(i, recurringEvent.rrule.freq),
-            recurringEvent.firstOccurenceStartDate
-              .plus(eventDuration, ChronoUnit.NANOS)
-              .toLocalTime
-          ),
-          recurringEvent.firstOccurenceEndDate.getZone
+        val events = recurringEvent.rrule.byday match {
+          case None =>
+            List(event)
+          case Some(x) if x.isEmpty =>
+            List(event)
+          case Some(x) =>
+            x.map { day =>
+              val realStart = if (day == eventStart.getDayOfWeek) {
+                eventStart
+              } else {
+                eventStart.`with`(TemporalAdjusters.next(day))
+              }
+
+              Event(
+                ZonedDateTime.of(
+                  LocalDateTime.of(
+                    realStart,
+                    recurringEvent.firstOccurenceStartDate.toLocalTime
+                  ),
+                  recurringEvent.firstOccurenceStartDate.getZone
+                ),
+                ZonedDateTime.of(
+                  LocalDateTime.of(
+                    realStart,
+                    recurringEvent.firstOccurenceStartDate
+                      .plus(eventDuration, ChronoUnit.NANOS)
+                      .toLocalTime
+                  ),
+                  recurringEvent.firstOccurenceEndDate.getZone
+                )
+              )
+            }
+        }
+
+        events.filterNot(e =>
+          recurringEvent.exdates
+            .exists(_.isEqual(e.startDate))
         )
-      )
-
-      recurringEvent.exdates
-        .exists(_.isEqual(event.startDate)) match {
-        case true =>
-          None
-        case false =>
-          Some(event)
       }
-    }.toSet
-  }
 
-  private def getGeneratorEndDate(recurringEvent: RecurringEvent) = {
-    val recurringEventFinalDate = (
-      recurringEvent.rrule.freq,
-      recurringEvent.rrule.count,
-      recurringEvent.rrule.until
-    ) match {
-      case (Freq.Daily, Some(count), None) =>
-        recurringEvent.firstOccurenceEndDate.plusDays(count - 1)
-      case (Freq.Weekly, Some(count), None) =>
-        recurringEvent.firstOccurenceEndDate.plusWeeks(count - 1)
-      case (Freq.Yearly, Some(count), None) =>
-        recurringEvent.firstOccurenceEndDate.plusYears(count - 1)
-      case (_, None, Some(finishDate)) =>
-        finishDate
-      case _ =>
-        throw new IllegalArgumentException(
-          "Will not happen until Recur has the require"
+    if (recurringEvent.rrule.count.isDefined) {
+      events.take(recurringEvent.rrule.count.get.toInt).toSet
+    } else {
+      val limit = recurringEvent.rrule.until.get
+      events
+        .takeWhile(x =>
+          x.startDate.isBefore(limit) || x.startDate.isEqual(limit)
         )
+        .toSet
     }
-
-    recurringEventFinalDate
   }
+
+  case class EventAndSize(events: List[Event], overallSize: Int)
 
   private implicit def FreqToTemporalUnit(freq: Freq.Value): ChronoUnit =
     freq match {

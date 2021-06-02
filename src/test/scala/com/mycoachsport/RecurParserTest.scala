@@ -10,11 +10,10 @@
 
 package com.mycoachsport
 
-import java.time.ZonedDateTime
-
+import java.time.{DayOfWeek, ZonedDateTime}
 import com.mycoachsport.exceptions.UnsupportedOrMissingFreqException
 import com.mycoachsport.model.DateTimeHelper._
-import com.mycoachsport.model.Freq
+import com.mycoachsport.model.{Freq, Recur}
 import org.scalatest.Matchers._
 import org.scalatest.WordSpec
 
@@ -51,6 +50,61 @@ class RecurParserTest extends WordSpec {
       RecurParser
         .parse("RRULE:FREQ=DAILY;UNTIL=19901025T0430")
         .until shouldBe None
+    }
+
+    "Parse with a full by day" in {
+      RecurParser
+        .parse(
+          "RRULE:FREQ=WEEKLY;COUNT=4;BYDAY=SU,MO,TU,WE,TH,FR,SA"
+        ) shouldBe
+        Recur(
+          Freq.Weekly,
+          Some(4),
+          None,
+          Some(
+            Set(
+              DayOfWeek.SUNDAY,
+              DayOfWeek.MONDAY,
+              DayOfWeek.TUESDAY,
+              DayOfWeek.WEDNESDAY,
+              DayOfWeek.THURSDAY,
+              DayOfWeek.FRIDAY,
+              DayOfWeek.SATURDAY
+            )
+          )
+        )
+    }
+
+    "Parse with a partial day" in {
+      RecurParser
+        .parse(
+          "RRULE:FREQ=WEEKLY;COUNT=4;BYDAY=MO,TU,WE,FR"
+        ) shouldBe
+        Recur(
+          Freq.Weekly,
+          Some(4),
+          None,
+          Some(
+            Set(
+              DayOfWeek.MONDAY,
+              DayOfWeek.TUESDAY,
+              DayOfWeek.WEDNESDAY,
+              DayOfWeek.FRIDAY
+            )
+          )
+        )
+    }
+
+    "Parse with an empty by day" in {
+      RecurParser
+        .parse(
+          "RRULE:FREQ=WEEKLY;COUNT=4;BYDAY="
+        ) shouldBe
+        Recur(
+          Freq.Weekly,
+          Some(4),
+          None
+        )
     }
   }
 }
