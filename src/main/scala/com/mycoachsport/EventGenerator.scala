@@ -71,31 +71,33 @@ object EventGenerator {
             List(event)
           case Some(x) =>
             x.map { day =>
-              val realStart = if (day == eventStart.getDayOfWeek) {
-                eventStart
-              } else {
-                eventStart.`with`(TemporalAdjusters.next(day))
-              }
+                val realStart = if (day == eventStart.getDayOfWeek) {
+                  eventStart
+                } else {
+                  eventStart.`with`(TemporalAdjusters.next(day))
+                }
 
-              Event(
-                ZonedDateTime.of(
-                  LocalDateTime.of(
-                    realStart,
-                    recurringEvent.firstOccurenceStartDate.toLocalTime
+                Event(
+                  ZonedDateTime.of(
+                    LocalDateTime.of(
+                      realStart,
+                      recurringEvent.firstOccurenceStartDate.toLocalTime
+                    ),
+                    recurringEvent.firstOccurenceStartDate.getZone
                   ),
-                  recurringEvent.firstOccurenceStartDate.getZone
-                ),
-                ZonedDateTime.of(
-                  LocalDateTime.of(
-                    realStart,
-                    recurringEvent.firstOccurenceStartDate
-                      .plus(eventDuration, ChronoUnit.NANOS)
-                      .toLocalTime
-                  ),
-                  recurringEvent.firstOccurenceEndDate.getZone
+                  ZonedDateTime.of(
+                    LocalDateTime.of(
+                      realStart,
+                      recurringEvent.firstOccurenceStartDate
+                        .plus(eventDuration, ChronoUnit.NANOS)
+                        .toLocalTime
+                    ),
+                    recurringEvent.firstOccurenceEndDate.getZone
+                  )
                 )
-              )
-            }
+              }
+              .toList
+              .sortWith((x, y) => x.startDate.isBefore(y.startDate))
         }
 
         events.filterNot(e =>
@@ -112,6 +114,7 @@ object EventGenerator {
         .takeWhile(x =>
           x.startDate.isBefore(limit) || x.startDate.isEqual(limit)
         )
+        .filter(x => x.startDate.isBefore(limit) || x.startDate.isEqual(limit))
         .toSet
     }
   }
