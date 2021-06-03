@@ -10,8 +10,7 @@
 
 package com.mycoachsport
 
-import java.time.{LocalDateTime, ZonedDateTime}
-
+import java.time.{DayOfWeek, LocalDateTime, ZonedDateTime}
 import com.mycoachsport.exceptions.UnsupportedOrMissingFreqException
 import com.mycoachsport.model.DateTimeHelper._
 import com.mycoachsport.model.{Freq, Recur}
@@ -26,6 +25,7 @@ import com.mycoachsport.model.{Freq, Recur}
   * <li>FREQ(WEEKLY|DAILY)</li>
   * <li>COUNT</li>
   * <li>UNTIL</li>
+  * <li>BYDAY</li>
   * </ul>
   *
   * The parser uses regex to extract the `Recur` fields.
@@ -35,6 +35,7 @@ object RecurParser {
   private val FreqPattern = ".*FREQ=(DAILY|WEEKLY|YEARLY).*".r
   private val CountPattern = ".*COUNT=(\\d+).*".r
   private val UntilPattern = ".*UNTIL=([0-9]{8}T[0-9]{6}Z).*".r
+  private val ByDayPattern = ".*BYDAY=(((SU|MO|TU|WE|TH|FR|SA),*)+).*".r
 
   /**
     * Returns a `Recur` instance corresponding to the string representation
@@ -43,7 +44,7 @@ object RecurParser {
     * @return returns a Recur matching the string rule
     */
   def parse(str: String): Recur = {
-    Recur(parseFreq(str), parseCount(str), parseUntil(str))
+    Recur(parseFreq(str), parseCount(str), parseUntil(str), parseByDay(str))
   }
 
   private def parseFreq(str: String): Freq.Value = {
@@ -71,5 +72,39 @@ object RecurParser {
       case _ =>
         None
     }
+  }
+
+  private def parseByDay(str: String): Option[Set[DayOfWeek]] = {
+    val matches =
+      ByDayPattern.findAllMatchIn(str).map(_.group(1)).toList.headOption
+
+    matches match {
+      case Some(days) =>
+        Some(
+          days
+            .split(",")
+            .map(toDayOfWeek)
+            .toSet
+        )
+      case _ =>
+        None
+    }
+  }
+
+  private def toDayOfWeek: String => DayOfWeek = {
+    case "SU" =>
+      DayOfWeek.SUNDAY
+    case "MO" =>
+      DayOfWeek.MONDAY
+    case "TU" =>
+      DayOfWeek.TUESDAY
+    case "WE" =>
+      DayOfWeek.WEDNESDAY
+    case "TH" =>
+      DayOfWeek.THURSDAY
+    case "FR" =>
+      DayOfWeek.FRIDAY
+    case "SA" =>
+      DayOfWeek.SATURDAY
   }
 }

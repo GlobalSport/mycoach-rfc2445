@@ -10,8 +10,7 @@
 
 package com.mycoachsport
 
-import java.time.ZonedDateTime
-
+import java.time.{DayOfWeek, ZonedDateTime}
 import com.mycoachsport.model.DateTimeHelper._
 import com.mycoachsport.model._
 import org.scalatest.Matchers._
@@ -280,7 +279,7 @@ class EventGeneratorTest extends WordSpec {
         ) shouldBe (0 until 3).map { n =>
         Event(
           ZonedDateTime.of(2018, 6, 18, 0, 0, 0, 0, UTC).plusYears(n),
-          ZonedDateTime.of(2018, 6, 18, 23, 59, 59, 0, UTC).plusYears(n),
+          ZonedDateTime.of(2018, 6, 18, 23, 59, 59, 0, UTC).plusYears(n)
         )
       }.toSet
     }
@@ -304,10 +303,14 @@ class EventGeneratorTest extends WordSpec {
         ) shouldBe (0 until 1).map { n =>
         Event(
           ZonedDateTime.of(2018, 6, 18, 0, 0, 0, 0, UTC).plusYears(n),
-          ZonedDateTime.of(2018, 6, 18, 23, 59, 59, 0, UTC).plusYears(n),
+          ZonedDateTime.of(2018, 6, 18, 23, 59, 59, 0, UTC).plusYears(n)
         )
       }.toSet
 
+      val startEvent = Event(
+        ZonedDateTime.of(2018, 6, 18, 0, 0, 0, 0, UTC),
+        ZonedDateTime.of(2018, 6, 18, 23, 59, 59, 0, UTC)
+      )
       EventGenerator
         .generate(
           RecurringEvent(
@@ -319,12 +322,17 @@ class EventGeneratorTest extends WordSpec {
               ZonedDateTime.of(2019, 6, 18, 0, 0, 0, 0, UTC)
             )
           )
-        ) shouldBe (0 until 1).map { n =>
-        Event(
-          ZonedDateTime.of(2018, 6, 18, 0, 0, 0, 0, UTC).plusYears(n),
-          ZonedDateTime.of(2018, 6, 18, 23, 59, 59, 0, UTC).plusYears(n),
+        ) shouldBe Set(
+        startEvent,
+        startEvent.copy(
+          startDate = startEvent.startDate.plusYears(3),
+          endDate = startEvent.endDate.plusYears(3)
+        ),
+        startEvent.copy(
+          startDate = startEvent.startDate.plusYears(4),
+          endDate = startEvent.endDate.plusYears(4)
         )
-      }.toSet
+      )
     }
 
     "Generate all daily events and exclude a set of dates" in {
@@ -347,14 +355,18 @@ class EventGeneratorTest extends WordSpec {
         .map { n =>
           Event(
             ZonedDateTime.of(2018, 6, 18, 0, 0, 0, 0, UTC).plusDays(n),
-            ZonedDateTime.of(2018, 6, 18, 23, 59, 59, 0, UTC).plusDays(n),
+            ZonedDateTime.of(2018, 6, 18, 23, 59, 59, 0, UTC).plusDays(n)
           )
         }
-        .filter(
-          r =>
-            r.startDate.getDayOfMonth != 20 && r.startDate.getDayOfMonth != 19
+        .filter(r =>
+          r.startDate.getDayOfMonth != 20 && r.startDate.getDayOfMonth != 19
         )
         .toSet
+
+      val startEvent = Event(
+        ZonedDateTime.of(2018, 6, 18, 0, 0, 0, 0, UTC),
+        ZonedDateTime.of(2018, 6, 18, 23, 59, 59, 0, UTC)
+      )
 
       EventGenerator
         .generate(
@@ -367,18 +379,21 @@ class EventGeneratorTest extends WordSpec {
               ZonedDateTime.of(2018, 6, 19, 0, 0, 0, 0, UTC)
             )
           )
-        ) shouldBe (0 to 3)
-        .map { n =>
-          Event(
-            ZonedDateTime.of(2018, 6, 18, 0, 0, 0, 0, UTC).plusDays(n),
-            ZonedDateTime.of(2018, 6, 18, 23, 59, 59, 0, UTC).plusDays(n),
-          )
-        }
-        .filter(
-          r =>
-            r.startDate.getDayOfMonth != 20 && r.startDate.getDayOfMonth != 19
+        ) shouldBe Set(
+        startEvent,
+        startEvent.copy(
+          startDate = startEvent.startDate.plusDays(3),
+          endDate = startEvent.endDate.plusDays(3)
+        ),
+        startEvent.copy(
+          startDate = startEvent.startDate.plusDays(4),
+          endDate = startEvent.endDate.plusDays(4)
+        ),
+        startEvent.copy(
+          startDate = startEvent.startDate.plusDays(5),
+          endDate = startEvent.endDate.plusDays(5)
         )
-        .toSet
+      )
     }
 
     "Generate all weekly events and exlucde a set of dates" in {
@@ -415,10 +430,242 @@ class EventGeneratorTest extends WordSpec {
               ZonedDateTime.of(2018, 6, 21, 10, 0, 0, 0, UTC)
             )
           )
-        ) shouldBe (2 until 3).map { n =>
+        ) shouldBe (0 to 2).map { n =>
         Event(
-          ZonedDateTime.of(2018, 6, 14, 10, 0, 0, 0, UTC).plusWeeks(n),
-          ZonedDateTime.of(2018, 6, 14, 12, 0, 0, 0, UTC).plusWeeks(n)
+          ZonedDateTime.of(2018, 6, 28, 10, 0, 0, 0, UTC).plusWeeks(n),
+          ZonedDateTime.of(2018, 6, 28, 12, 0, 0, 0, UTC).plusWeeks(n)
+        )
+      }.toSet
+    }
+
+    "Generate weekly events bound by count with byday" in {
+      val expected = (0 until 5).flatMap { n =>
+        val e = Event(
+          ZonedDateTime.of(2018, 6, 18, 10, 0, 0, 0, UTC).plusWeeks(n),
+          ZonedDateTime.of(2018, 6, 18, 12, 0, 0, 0, UTC).plusWeeks(n)
+        )
+        Set(
+          e,
+          e.copy(
+            startDate = e.startDate.plusDays(1),
+            endDate = e.endDate.plusDays(1)
+          )
+        )
+      }.toSet
+
+      val actual = EventGenerator
+        .generate(
+          RecurringEvent(
+            ZonedDateTime.of(2018, 6, 18, 10, 0, 0, 0, UTC),
+            ZonedDateTime.of(2018, 6, 18, 12, 0, 0, 0, UTC),
+            Recur(
+              Freq.Weekly,
+              Some(10),
+              None,
+              Some(Set(DayOfWeek.MONDAY, DayOfWeek.TUESDAY))
+            ),
+            Set()
+          )
+        )
+      actual shouldBe expected
+    }
+
+    "Generate weekly events bound by count with byday with a full week" in {
+      EventGenerator
+        .generate(
+          RecurringEvent(
+            ZonedDateTime.of(2018, 6, 18, 10, 0, 0, 0, UTC),
+            ZonedDateTime.of(2018, 6, 18, 12, 0, 0, 0, UTC),
+            Recur(
+              Freq.Weekly,
+              Some(17),
+              None,
+              Some(
+                Set(
+                  DayOfWeek.MONDAY,
+                  DayOfWeek.TUESDAY,
+                  DayOfWeek.WEDNESDAY,
+                  DayOfWeek.THURSDAY,
+                  DayOfWeek.FRIDAY,
+                  DayOfWeek.SATURDAY,
+                  DayOfWeek.SUNDAY
+                )
+              )
+            ),
+            Set()
+          )
+        ) shouldBe (0 until 17).map { x =>
+        Event(
+          ZonedDateTime.of(2018, 6, 18, 10, 0, 0, 0, UTC).plusDays(x),
+          ZonedDateTime.of(2018, 6, 18, 12, 0, 0, 0, UTC).plusDays(x)
+        )
+      }.toSet
+    }
+
+    "Generate weekly events bound by count with byday when first occurence is not in the list of days" in {
+      EventGenerator
+        .generate(
+          RecurringEvent(
+            ZonedDateTime.of(2018, 6, 18, 10, 0, 0, 0, UTC),
+            ZonedDateTime.of(2018, 6, 18, 12, 0, 0, 0, UTC),
+            Recur(
+              Freq.Weekly,
+              Some(10),
+              None,
+              Some(
+                Set(DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.FRIDAY)
+              )
+            ),
+            Set()
+          )
+        ) shouldBe (0 until 4)
+        .flatMap { n =>
+          val e = Event(
+            ZonedDateTime.of(2018, 6, 19, 10, 0, 0, 0, UTC).plusWeeks(n),
+            ZonedDateTime.of(2018, 6, 19, 12, 0, 0, 0, UTC).plusWeeks(n)
+          )
+          Set(
+            e,
+            e.copy(
+              startDate = e.startDate.plusDays(1),
+              endDate = e.endDate.plusDays(1)
+            ),
+            e.copy(
+              startDate = e.startDate.plusDays(3),
+              endDate = e.endDate.plusDays(3)
+            )
+          )
+        }
+        .slice(0, 10)
+        .toSet
+    }
+
+    "Generate all weekly events bound by until with byday" in {
+      val startEvent = Event(
+        ZonedDateTime.of(2018, 6, 18, 10, 0, 0, 0, UTC),
+        ZonedDateTime.of(2018, 6, 18, 12, 0, 0, 0, UTC)
+      )
+
+      EventGenerator
+        .generate(
+          RecurringEvent(
+            ZonedDateTime.of(2018, 6, 18, 10, 0, 0, 0, UTC),
+            ZonedDateTime.of(2018, 6, 18, 12, 0, 0, 0, UTC),
+            Recur(
+              Freq.Weekly,
+              None,
+              Some(ZonedDateTime.of(2018, 7, 5, 0, 0, 0, 0, UTC)),
+              Some(Set(DayOfWeek.MONDAY, DayOfWeek.TUESDAY))
+            ),
+            Set()
+          )
+        ) shouldBe (0 until 3).flatMap { n =>
+        Set(
+          startEvent.copy(
+            startDate = startEvent.startDate.plusWeeks(n),
+            endDate = startEvent.endDate.plusWeeks(n)
+          ),
+          startEvent.copy(
+            startDate = startEvent.startDate.plusDays(1).plusWeeks(n),
+            endDate = startEvent.endDate.plusDays(1).plusWeeks(n)
+          )
+        )
+      }.toSet
+    }
+
+    "Generate all weekly events bound by until with byday with a full week" in {
+      EventGenerator
+        .generate(
+          RecurringEvent(
+            ZonedDateTime.of(2018, 6, 18, 10, 0, 0, 0, UTC),
+            ZonedDateTime.of(2018, 6, 18, 12, 0, 0, 0, UTC),
+            Recur(
+              Freq.Weekly,
+              None,
+              Some(ZonedDateTime.of(2018, 7, 5, 0, 0, 0, 0, UTC)),
+              Some(
+                Set(
+                  DayOfWeek.MONDAY,
+                  DayOfWeek.TUESDAY,
+                  DayOfWeek.WEDNESDAY,
+                  DayOfWeek.THURSDAY,
+                  DayOfWeek.FRIDAY,
+                  DayOfWeek.SATURDAY,
+                  DayOfWeek.SUNDAY
+                )
+              )
+            ),
+            Set()
+          )
+        ) shouldBe (0 until 17).map { x =>
+        Event(
+          ZonedDateTime.of(2018, 6, 18, 10, 0, 0, 0, UTC).plusDays(x),
+          ZonedDateTime.of(2018, 6, 18, 12, 0, 0, 0, UTC).plusDays(x)
+        )
+      }.toSet
+    }
+
+    "Generate all weekly events bound by until with byday when first occurrence is not in the list of days" in {
+      val startEvent = Event(
+        ZonedDateTime.of(2018, 6, 19, 10, 0, 0, 0, UTC),
+        ZonedDateTime.of(2018, 6, 19, 12, 0, 0, 0, UTC)
+      )
+
+      EventGenerator
+        .generate(
+          RecurringEvent(
+            ZonedDateTime.of(2018, 6, 18, 10, 0, 0, 0, UTC),
+            ZonedDateTime.of(2018, 6, 18, 12, 0, 0, 0, UTC),
+            Recur(
+              Freq.Weekly,
+              None,
+              Some(ZonedDateTime.of(2018, 7, 5, 0, 0, 0, 0, UTC)),
+              Some(Set(DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY))
+            ),
+            Set()
+          )
+        ) shouldBe (0 until 3).flatMap { n =>
+        Set(
+          startEvent.copy(
+            startDate = startEvent.startDate.plusWeeks(n),
+            endDate = startEvent.endDate.plusWeeks(n)
+          ),
+          startEvent.copy(
+            startDate = startEvent.startDate.plusDays(1).plusWeeks(n),
+            endDate = startEvent.endDate.plusDays(1).plusWeeks(n)
+          )
+        )
+      }.toSet
+    }
+
+    "Make sure BYDAY is ignored for a daily or yearly event" in {
+      EventGenerator
+        .generate(
+          RecurringEvent(
+            ZonedDateTime.of(2018, 6, 20, 10, 0, 0, 0, UTC),
+            ZonedDateTime.of(2018, 6, 20, 12, 0, 0, 0, UTC),
+            Recur(Freq.Daily, Some(10), None, Some(Set(DayOfWeek.THURSDAY))),
+            Set()
+          )
+        ) shouldBe (0 until 10).map { n =>
+        Event(
+          ZonedDateTime.of(2018, 6, 20, 10, 0, 0, 0, UTC).plusDays(n),
+          ZonedDateTime.of(2018, 6, 20, 12, 0, 0, 0, UTC).plusDays(n)
+        )
+      }.toSet
+
+      EventGenerator
+        .generate(
+          RecurringEvent(
+            ZonedDateTime.of(2018, 6, 20, 10, 0, 0, 0, UTC),
+            ZonedDateTime.of(2018, 6, 20, 12, 0, 0, 0, UTC),
+            Recur(Freq.Yearly, Some(10), None, Some(Set(DayOfWeek.THURSDAY))),
+            Set()
+          )
+        ) shouldBe (0 until 10).map { n =>
+        Event(
+          ZonedDateTime.of(2018, 6, 20, 10, 0, 0, 0, UTC).plusYears(n),
+          ZonedDateTime.of(2018, 6, 20, 12, 0, 0, 0, UTC).plusYears(n)
         )
       }.toSet
     }

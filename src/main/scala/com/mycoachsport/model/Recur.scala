@@ -10,8 +10,7 @@
 
 package com.mycoachsport.model
 
-import java.time.ZonedDateTime
-
+import java.time.{DayOfWeek, ZonedDateTime}
 import com.mycoachsport.model.DateTimeHelper._
 
 /**
@@ -24,8 +23,16 @@ import com.mycoachsport.model.DateTimeHelper._
   * @param until the date until this recurrence rule should apply
   * @throws IllegalArgumentException when both `until` and `count` parameters are set to `Some`
   */
-case class Recur(freq: Freq.Value, count: Option[Long], until: Option[ZonedDateTime]) {
-  require(!(count.isDefined && until.isDefined), "'count' and 'until' are mutually exclusive parameters")
+case class Recur(
+    freq: Freq.Value,
+    count: Option[Long],
+    until: Option[ZonedDateTime],
+    byday: Option[Set[DayOfWeek]] = None
+) {
+  require(
+    !(count.isDefined && until.isDefined),
+    "'count' and 'until' are mutually exclusive parameters"
+  )
 
   /**
     * Returns the corresponding RECUR string representation
@@ -34,7 +41,30 @@ case class Recur(freq: Freq.Value, count: Option[Long], until: Option[ZonedDateT
     Seq(
       Some(s"FREQ=${freq.toString}"),
       count.map(c => s"COUNT=$c"),
-      until.map(u => s"UNTIL=${u.format(ICalUtcDateTimeFormat)}")
+      until.map(u => s"UNTIL=${u.format(ICalUtcDateTimeFormat)}"),
+      byday.map {
+        case x if x.nonEmpty =>
+          s"BYDAY=${x.map(dayOfWeekToString).mkString(",")}"
+        case _ =>
+          ""
+      }
     ).flatten.mkString(";")
+  }
+
+  private def dayOfWeekToString: DayOfWeek => String = {
+    case DayOfWeek.MONDAY =>
+      "MO"
+    case DayOfWeek.TUESDAY =>
+      "TU"
+    case DayOfWeek.WEDNESDAY =>
+      "WE"
+    case DayOfWeek.THURSDAY =>
+      "TH"
+    case DayOfWeek.FRIDAY =>
+      "FR"
+    case DayOfWeek.SATURDAY =>
+      "SA"
+    case DayOfWeek.SUNDAY =>
+      "SU"
   }
 }
