@@ -57,4 +57,7 @@ pomExtra := (<url>https://github.com/GlobalSport/mycoach-rfc2445</url>
 pgpPublicRing := file("public.key")
 pgpSecretRing := file("private.key")
 
-libraryDependencies ++= Seq("org.scalatest" %% "scalatest" % "3.1.1" % Test)
+libraryDependencies ++= Seq(
+  "org.scalatest" %% "scalatest" % "3.1.1" % Test,
+  "org.scala-lang.modules" %% "scala-collection-compat" % "2.4.4"
+)

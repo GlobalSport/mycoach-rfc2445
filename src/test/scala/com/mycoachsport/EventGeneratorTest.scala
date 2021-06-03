@@ -512,6 +512,27 @@ class EventGeneratorTest extends WordSpec {
         )
       actual shouldBe expected
     }
+
+    "Generate all weekly events bound by until including " in {
+      EventGenerator
+        .generate(
+          RecurringEvent(
+            ZonedDateTime.of(2018, 6, 14, 10, 0, 0, 0, UTC),
+            ZonedDateTime.of(2018, 6, 14, 12, 0, 0, 0, UTC),
+            Recur(
+              Freq.Weekly,
+              None,
+              Some(ZonedDateTime.of(2018, 6, 29, 0, 0, 0, 0, UTC))
+            ),
+            Set()
+          )
+        ) shouldBe (0 until 3).map { n =>
+        Event(
+          ZonedDateTime.of(2018, 6, 14, 10, 0, 0, 0, UTC).plusWeeks(n),
+          ZonedDateTime.of(2018, 6, 14, 12, 0, 0, 0, UTC).plusWeeks(n)
+        )
+      }.toSet
+    }
   }
 
 }

@@ -40,7 +40,7 @@ object EventGenerator {
     val eventDuration: Long = recurringEvent.firstOccurenceStartDate
       .until(recurringEvent.firstOccurenceEndDate, ChronoUnit.NANOS)
 
-    val events = LazyList
+    val events = Stream
       .from(0)
       .flatMap { i =>
         val eventStart = startDate.plus(i, recurringEvent.rrule.freq)
