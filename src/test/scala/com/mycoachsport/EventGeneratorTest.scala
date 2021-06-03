@@ -637,6 +637,38 @@ class EventGeneratorTest extends WordSpec {
         )
       }.toSet
     }
+
+    "Make sure BYDAY is ignored for a daily or yearly event" in {
+      EventGenerator
+        .generate(
+          RecurringEvent(
+            ZonedDateTime.of(2018, 6, 20, 10, 0, 0, 0, UTC),
+            ZonedDateTime.of(2018, 6, 20, 12, 0, 0, 0, UTC),
+            Recur(Freq.Daily, Some(10), None, Some(Set(DayOfWeek.THURSDAY))),
+            Set()
+          )
+        ) shouldBe (0 until 10).map { n =>
+        Event(
+          ZonedDateTime.of(2018, 6, 20, 10, 0, 0, 0, UTC).plusDays(n),
+          ZonedDateTime.of(2018, 6, 20, 12, 0, 0, 0, UTC).plusDays(n)
+        )
+      }.toSet
+
+      EventGenerator
+        .generate(
+          RecurringEvent(
+            ZonedDateTime.of(2018, 6, 20, 10, 0, 0, 0, UTC),
+            ZonedDateTime.of(2018, 6, 20, 12, 0, 0, 0, UTC),
+            Recur(Freq.Yearly, Some(10), None, Some(Set(DayOfWeek.THURSDAY))),
+            Set()
+          )
+        ) shouldBe (0 until 10).map { n =>
+        Event(
+          ZonedDateTime.of(2018, 6, 20, 10, 0, 0, 0, UTC).plusYears(n),
+          ZonedDateTime.of(2018, 6, 20, 12, 0, 0, 0, UTC).plusYears(n)
+        )
+      }.toSet
+    }
   }
 
 }

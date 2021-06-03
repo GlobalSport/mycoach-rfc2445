@@ -64,41 +64,46 @@ object EventGenerator {
             )
           )
 
-        val events = recurringEvent.rrule.byday match {
-          case None =>
-            List(event)
-          case Some(x) if x.isEmpty =>
-            List(event)
-          case Some(x) =>
-            x.map { day =>
-                val realStart = if (day == eventStart.getDayOfWeek) {
-                  eventStart
-                } else {
-                  eventStart.`with`(TemporalAdjusters.next(day))
-                }
+        val events =
+          if (recurringEvent.rrule.freq == Freq.Weekly) {
+            recurringEvent.rrule.byday match {
+              case None =>
+                List(event)
+              case Some(x) if x.isEmpty =>
+                List(event)
+              case Some(x) =>
+                x.map { day =>
+                    val realStart = if (day == eventStart.getDayOfWeek) {
+                      eventStart
+                    } else {
+                      eventStart.`with`(TemporalAdjusters.next(day))
+                    }
 
-                Event(
-                  ZonedDateTime.of(
-                    LocalDateTime.of(
-                      realStart,
-                      recurringEvent.firstOccurenceStartDate.toLocalTime
-                    ),
-                    recurringEvent.firstOccurenceStartDate.getZone
-                  ),
-                  ZonedDateTime.of(
-                    LocalDateTime.of(
-                      realStart,
-                      recurringEvent.firstOccurenceStartDate
-                        .plus(eventDuration, ChronoUnit.NANOS)
-                        .toLocalTime
-                    ),
-                    recurringEvent.firstOccurenceEndDate.getZone
-                  )
-                )
-              }
-              .toList
-              .sortWith((x, y) => x.startDate.isBefore(y.startDate))
-        }
+                    Event(
+                      ZonedDateTime.of(
+                        LocalDateTime.of(
+                          realStart,
+                          recurringEvent.firstOccurenceStartDate.toLocalTime
+                        ),
+                        recurringEvent.firstOccurenceStartDate.getZone
+                      ),
+                      ZonedDateTime.of(
+                        LocalDateTime.of(
+                          realStart,
+                          recurringEvent.firstOccurenceStartDate
+                            .plus(eventDuration, ChronoUnit.NANOS)
+                            .toLocalTime
+                        ),
+                        recurringEvent.firstOccurenceEndDate.getZone
+                      )
+                    )
+                  }
+                  .toList
+                  .sortWith((x, y) => x.startDate.isBefore(y.startDate))
+            }
+          } else {
+            List(event)
+          }
 
         events.filterNot(e =>
           recurringEvent.exdates
